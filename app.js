@@ -34,6 +34,7 @@
         lastCorrect: false,
         showCorrectLine: false, // whether to draw the correct answer line
         needsHint: false,
+        examplePoints: [], // store example points to draw them on canvas
     };
 
     // ========================================
@@ -147,6 +148,7 @@
 
         drawUserLine(size);
         drawPoints(size);
+        drawExamplePoints(size);
     }
 
     function drawGrid(size) {
@@ -527,9 +529,58 @@
         });
     }
 
+    function drawExamplePoints() {
+        if (!state.showCorrectLine || state.lastCorrect || !state.examplePoints || state.examplePoints.length === 0) return;
+        
+        state.examplePoints.forEach((pt) => {
+            const px = gridToPixel(pt.x, pt.y);
+            
+            // White outline for contrast
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(px.x, px.y, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Vibrant red point
+            ctx.fillStyle = '#ff3c3c';
+            ctx.beginPath();
+            ctx.arc(px.x, px.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Coordinate label
+            ctx.fillStyle = '#ff1a1a';
+            ctx.font = 'bold 12px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            
+            // Background for label
+            const labelText = `(${pt.x},${pt.y})`;
+            const tm = ctx.measureText(labelText);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.beginPath();
+            ctx.roundRect(px.x - tm.width / 2 - 4, px.y + 7, tm.width + 8, 16, 4);
+            ctx.fill();
+
+            // Text
+            ctx.fillStyle = '#cc0000';
+            ctx.fillText(labelText, px.x, px.y + 8);
+        });
+    }
+
     // ========================================
     // Equation Generation
     // ========================================
+    function getGcd(x, y) {
+        x = Math.abs(x);
+        y = Math.abs(y);
+        while(y) {
+            let t = y;
+            y = x % y;
+            x = t;
+        }
+        return x;
+    }
+
     function generateEquation() {
         let a, b, c;
         let attempts = 0;
@@ -545,7 +596,15 @@
             c = a * px + b * py;
 
             const validPoints = findValidPoints(a, b, c);
-            if (validPoints.length >= 2) break;
+            if (validPoints.length >= 2) {
+                const g = getGcd(getGcd(a, b), c);
+                if (g > 1) {
+                    a /= g;
+                    b /= g;
+                    c /= g;
+                }
+                break;
+            }
 
             attempts++;
         } while (attempts < 100);
@@ -699,7 +758,14 @@
             const validPts = findValidPoints(a, b, c);
             let hint = '紅色直線為正確答案。';
             if (validPts.length >= 2) {
-                hint += ` 例如 (${validPts[0].x}, ${validPts[0].y}) 和 (${validPts[1].x}, ${validPts[1].y}) 皆在此直線上。`;
+                let pt1 = validPts.reduce((min, p) => Math.abs(p.y) < Math.abs(min.y) ? p : min, validPts[0]);
+                let remaining = validPts.filter(p => !(p.x === pt1.x && p.y === pt1.y));
+                let pt2 = remaining.reduce((min, p) => Math.abs(p.x) < Math.abs(min.x) ? p : min, remaining[0]);
+
+                state.examplePoints = [pt1, pt2];
+                hint += ` 例如 (${pt1.x}, ${pt1.y}) 和 (${pt2.x}, ${pt2.y}) 皆在此直線上。`;
+            } else {
+                state.examplePoints = [];
             }
             elInlineFeedbackMessage.textContent = hint;
             elInlineFeedbackScoreText.textContent = '+0 分';
@@ -751,6 +817,7 @@
         state.answered = false;
         state.lastCorrect = false;
         state.showCorrectLine = false;
+        state.examplePoints = [];
         wrapper.classList.remove('correct-flash', 'wrong-flash');
 
         hideInlineFeedback();
