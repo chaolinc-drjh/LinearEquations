@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二元一次方程式圖形練習</title>
+    <meta name="description" content="互動式二元一次方程式繪圖練習，在座標平面上拖曳兩點畫出直線">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Content: Side Panel + Grid -->
+        <main class="main-content">
+            <!-- Left Panel: All Controls and Info -->
+            <aside class="side-panel">
+                <!-- Branding -->
+                <div class="brand-section">
+                    <div class="logo-icon">📐</div>
+                    <h1>二元一次方程式圖形練習</h1>
+                </div>
+
+                <!-- Equation & Round -->
+                <div class="equation-section">
+                    <div class="equation-header">
+                        <span class="equation-label">題目</span>
+                        <div class="round-badge">
+                            <span class="round-label">回合</span>
+                            <span class="round-number" id="roundNumber">1</span>
+                        </div>
+                    </div>
+                    <div class="equation-display" id="equationDisplay">
+                        <span class="question-counter" id="questionCounter">1 / 10</span>
+                        <span class="equation-text" id="equationText">2<span class="math-var">x</span> + 3<span class="math-var">y</span> = 6</span>
+                    </div>
+                </div>
+
+                <!-- Points Info -->
+                <div class="panel-section points-section">
+                    <div class="section-title"><span>📍</span> 座標點</div>
+                    <div class="point-row" id="point1Row">
+                        <div class="point-marker p1"></div>
+                        <span class="point-label">A：</span>
+                        <span class="point-value" id="point1Value">未設定</span>
+                    </div>
+                    <div class="point-row" id="point2Row">
+                        <div class="point-marker p2"></div>
+                        <span class="point-label">B：</span>
+                        <span class="point-value" id="point2Value">未設定</span>
+                    </div>
+                </div>
+
+                <!-- Score -->
+                <div class="panel-section score-section">
+                    <div class="section-title"><span>🏆</span> 得分</div>
+                    <div class="score-row">
+                        <span class="score-value" id="scoreValue">0</span>
+                        <span class="score-max">/ 100</span>
+                    </div>
+                    <div class="score-bar-container">
+                        <div class="score-bar" id="scoreBar"></div>
+                    </div>
+                    <div class="score-details">
+                        <span>✅ <b id="correctCount">0</b></span>
+                        <span>❌ <b id="wrongCount">0</b></span>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="panel-section buttons-section">
+                    <button class="btn btn-submit" id="btnSubmit" disabled>
+                        <span>✔️ 提交答案</span>
+                    </button>
+                    <button class="btn btn-reset" id="btnReset">
+                        <span>🔄 重置</span>
+                    </button>
+                </div>
+
+                <!-- Inline Feedback -->
+                <div class="panel-section feedback-section" id="inlineFeedback" style="display:none;">
+                    <div class="inline-feedback-header" id="inlineFeedbackHeader">
+                        <span class="inline-feedback-icon" id="inlineFeedbackIcon">🎉</span>
+                        <span class="inline-feedback-title" id="inlineFeedbackTitle">正確！</span>
+                    </div>
+                    <p class="inline-feedback-message" id="inlineFeedbackMessage">太棒了！</p>
+                    <p class="inline-feedback-score" id="inlineFeedbackScoreText">+10 分</p>
+                    <button class="btn btn-confirm" id="btnNextInline">
+                        <span id="btnNextInlineText">下一題 →</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Grid Canvas -->
+            <section class="grid-panel">
+                <div class="canvas-wrapper" id="canvasWrapper">
+                    <canvas id="gridCanvas"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <!-- Round Complete Overlay -->
+        <div class="feedback-overlay" id="roundOverlay">
+            <div class="round-card">
+                <div class="round-icon">🎉</div>
+                <div class="round-title">本回合結束！</div>
+                <div class="round-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">總得分</span>
+                        <span class="summary-value" id="finalScore">0</span>
+                        <span class="summary-unit">/ 100</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">正確率</span>
+                        <span class="summary-value" id="accuracy">0%</span>
+                    </div>
+                </div>
+                <div class="round-stars" id="roundStars"></div>
+                <button class="btn btn-confirm" id="btnNewRound">
+                    <span>開始新回合 🔁</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
